@@ -26,6 +26,51 @@ abstract class Image {
 		}
 		
 		$this->scale($scale);
+		return $this;
+	}
+	
+	public function fill($width, $height){
+		$this->resize($width, $height, false);
+		$x = (int)($this->width - $width) / 2;
+		$y = (int)($this->height - $height) / 2;
+		$this->crop($width, $height, $x, $y);
+	}
+	
+	public function __destruct() {
+		$this->destroy();
+	}
+	
+	protected function wrap_text($text, $size, $font_file, $width) {
+		$blocks = explode("\n", $text);
+		$lines = array();
+		foreach($blocks as $block) {
+			$words = explode(' ', $block);
+			$line = '';
+			$line_width = 0;
+			$count = count($words);
+			foreach($words as $key => $word) {
+				$prefix = $line == ''?'':' ';
+				$size = $this->text_size($prefix.$word, $size, $font_file);
+				$word_width = $size['width'];
+				if ($line == '' || $line_width + $word_width < $width) {
+					$line.= $prefix.$word;
+					$line_width+=$word_width
+				}else {
+					$lines[] = $line;
+					$line = $word;
+					$size = $this->text_size($word, $size, $font_file);
+					$line_width = $size['width'];
+				}
+			}
+		}
+		return implode("\n", $lines);
+	}
+	
+	public function text($text, $size, $color, $x, $y, $font_file, $opacity = 1, $angle = 0, $wrap_width = null) {
+		if ($wrap_width != null)
+			$text = $this->wrap_text($text, $size, $font_file, $wrap_width);
+		$this->draw_text($text, $size, $color, $x, $y, $font_file, $opacity = 1, $angle = 0);
+		return $this;
 	}
 	
 }
