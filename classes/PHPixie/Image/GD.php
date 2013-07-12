@@ -2,7 +2,7 @@
 
 namespace PHPixie\Image;
 
-class GD {
+class GD extends Image{
 
 	protected $image;
 	
@@ -73,6 +73,12 @@ class GD {
 		$this->enable_alpha($image);
 		$this->set_image($image, $size[0], $size[1]);
 		
+	}
+	
+	public function blank($width, $height, $color = 0xffffff, $opacity = 0) {
+		$image = $this->create($width, $height);
+		$this->set_image($image, $width, $height);
+		imagefilledrectangle($this->image, 0, 0, $width, $height, $this->get_color($color, $opacity));
 	}
 	
 	public function render($format = 'png') {
@@ -149,21 +155,11 @@ class GD {
 		if (!$flip_x && !$flip_y)
 			return $this;
 			
-		$x = 0;
-		$width = $this->width;
+		$x = $flip_x ? $this->width-1 : 0;;
+		$width = ($flip_x?-1:1) * $this->width;
 		
-		$y = 0;
-		$height = $this->height;
-		
-		if($flip_x) {
-			$x = $width - 1;
-			$width = 0-$width;
-		}
-		
-		if($flip_y) {
-			$y = $height - 1;
-			$height = 0-$height;
-		}
+		$y = $flip_y ? $this->height-1 : 0;;
+		$height = ($flip_y?-1:1) * $this->height;
 		
 		$flipped = $this->create($this->width, $this->height);
 		imagecopyresampled($flipped, $this->image, 0, 0, $x, $y, $this->width, $this->height, $width, $height);
@@ -171,21 +167,36 @@ class GD {
 		return $this;
 	}
 	
-	public function overlay($layer, $x=0, $y=0) {
+	public function overlay($layer, $x = 0, $y = 0) {
 		imagealphablending($this->image, true);
 		imagecopy($this->image, $layer->image, $x, $y, 0, 0, $layer->width, $layer->height);
 		imagealphablending($canvas, false);
 	}
 	
-	protected function draw_text($text, $size, $color, $x, $y, $font_file, $opacity = 1, $angle = 0){
-		imagefttext($this->image, $size, $angle, $x, $y, $color, $fontfile, $text);
+	protected function draw_text($text, $size, $font_file, $x, $y, $color, $opacity, $angle) {
+		$box = $this->text_size($text, $size, $font_file);
+		
+		$rad = deg2rad($angle);
+		$offset = 0 - $box['y1'];
+		$offset_x = sin($rad) * $offset;
+		$offset_y = cos($rad) * $offset;
+		
+		$color = $this->get_color($color, $opacity);
+		imagealphablending($this->image, true);
+		imagettftext($this->image, $size, $angle, $x + $offset_x, $y + $offset_y, $color, $font_file, $text);
+		imagealphablending($this->image, false);
+		return $box;
 	}
 	
-	public function text_size($text, $size, $font_file) {
-		$size = imagettfbbox($size, 0, $font_file, $text);
+	public function text_metrics($text, $size, $font_file) {
+		$box = imagettfbbox($size, 0, $font_file, $text);
 		return array(
-			'width' => $size[2] - $size[6],
-			'height'=> $size[3] - $size[7]
+			'x1'     => $box[6],
+			'y1'     => $box[7],
+			'x2'     => $box[2],
+			'y2'     => $box[3],
+			'width'  => $box[2] - $box[6],
+			'height' => $box[3] - $box[7]
 		);
 	}
 }
