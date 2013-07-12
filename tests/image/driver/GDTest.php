@@ -4,33 +4,34 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 
 	protected $image;
 	protected $files_dir;
-	protected $test_img;
+	protected $test_png;
+	protected $test_jpg;
 	protected $test_font;
 	
 	protected function setUp() {
 		$this->files_dir = dirname(dirname(__DIR__)).'/files/';
-		$this->test_img = $this->files_dir.'pixie.png';
+		$this->test_png = $this->files_dir.'pixie.png';
+		$this->test_jpg = $this->files_dir.'pixie.jpg';
 		$this->test_font = $this->files_dir.'Sofia-Regular.ttf';
 		$this->image = new \PHPixie\Image\GD();
 	}
 
 	public function testRead() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$this->assertSize(278, 300);
-		$size = $this->image-> text_metrics('korova',30,$this->test_font);
+		//$this->save();die;
 	}
 	
 	public function testCrop() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$this->image->crop(400, 40, 163, 62);
-		//$this->image-> save($this->img_dir.'pixie1.png', 'png');
 		$this->assertSize(115, 40);
 		$this->assertPixel(1, 1, 0xf66bab, 1);
 		$this->assertPixel(50,6, 0x98fcfc, 0.5);
 	}
 
 	public function testScale() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$this->image->scale(0.5);
 		//$this->image-> save($this->img_dir.'pixie1.png', 'png');
 		$this->assertSize(139, 150);
@@ -40,7 +41,7 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function testRotate() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$this->image->rotate(45);
 		//$this->save();
 		$this->assertSize(409, 409);
@@ -49,7 +50,7 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function testFlip() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$this->image->flip(true, true);
 		//$this->save();
 		$this->assertSize(278, 300);
@@ -57,13 +58,30 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 		$this->assertPixel(170, 190, 0xf2c3a8, 1);
 	}
 
-	public function testOverlay() {
-		$this->image->read($this->test_img);
-		$this->image->flip(true, true);
-		//$this->save();
+	public function test_Overlay() {
+		$this->image-> read($this->test_png);
+		
+		$image2 = new \PHPixie\Image\GD();
+		$image2->read($this->test_png);
+		$image2->flip(true);
+		$this->image->overlay($image2, 10, 10);
 		$this->assertSize(278, 300);
-		$this->assertPixel(30, 190, 0x93f5f5, 0.5);
-		$this->assertPixel(170, 190, 0xf2c3a8, 1);
+		$this->assertPixel(38, 92, 0xc8ee9e, 1);
+		$this->assertPixel(261, 84, 0x93f5f5, 0.5);
+	}
+
+	
+	public function test_OverlayJpg() {
+		$this->image-> read($this->test_jpg);
+		
+		$image2 = new \PHPixie\Image\GD();
+		$image2->read($this->test_png);
+		$image2->flip(true);
+		$this->image-> overlay($image2, 10, 10);
+		$this->save();
+		$this->assertSize(278, 300);
+		$this->assertPixel(38, 92, 0xc8f09b, 1);
+		$this->assertPixel(261, 84, 0xcafafc, 1);
 	}
 	
 	public function testText_size() {
@@ -74,7 +92,7 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function test_Text() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$size = $this->image-> text("hello\nworld", 30, $this->test_font, 10, 10, 0xff0000, 0.5);
 		$this->assertPixel(101, 71, 0xfc6e65, 1);
 		$this->assertPixel(62, 71, 0xff0000, 0.5);
@@ -85,7 +103,7 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 	}
 
 	public function test_TextAngle() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$size = $this->image->text("hello\nworld\nhi", 30, $this->test_font, 40, 70, 0xff0000, 0.5, 45);
 		//$this->save();
 		$this->assertPixel(56, 83, 0xff0000, 0.5);
@@ -93,12 +111,14 @@ class GD_Image_Test extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function test_TextWrap() {
-		$this->image->read($this->test_img);
+		$this->image->read($this->test_png);
 		$size = $this->image->text("Tinkerbell is a magical fairy that enjoys picking flowers and singing songs in the forest.\nShe also has a friend named Trixie", 20, $this->test_font, 10, 70, 0xff0000, 0.5, 0, 258,1.4);
-		$this->save();
+		//$this->save();
 		$this->assertPixel(246, 170, 0xff0000, 0.5);
 		$this->assertPixel(105, 254, 0xf99a8b, 1);
 	}
+	
+	
 	
 	protected function tearDown(){
 		$this->image = null;

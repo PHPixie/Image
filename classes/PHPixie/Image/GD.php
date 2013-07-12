@@ -17,15 +17,10 @@ class GD extends Image{
 	
 	protected function create($width, $height, $force_transparency = false) {
 		$image = imagecreatetruecolor($width, $height);
-		$this->enable_alpha($image);
+		imagealphablending($image, false);
 		if ($force_transparency)
 			imagefilledrectangle($image, 0, 0, $width, $height, $this->get_color(0xffffff, 0));
 		return $image;
-	}
-	
-	protected function enable_alpha($image) {
-		imagealphablending($image, false);
-		imagesavealpha($image, true);
 	}
 	
 	protected function get_color($color, $opacity) {
@@ -70,7 +65,7 @@ class GD extends Image{
 				break;
 		}
 		
-		$this->enable_alpha($image);
+		imagealphablending($image, false);
 		$this->set_image($image, $size[0], $size[1]);
 		
 	}
@@ -85,9 +80,11 @@ class GD extends Image{
 		switch($format) {
 			case 'png':
 				header('Content-Type: image/png');
+				imagesavealpha($this->image, true);
 				imagepng($this->image);
 				break;
-			case 'png':
+			case 'jpg':
+			case 'jpeg':
 				header('Content-Type: image/jpeg');
 				imagejpeg($this->image);
 				break;
@@ -104,9 +101,11 @@ class GD extends Image{
 	public function save($file, $format) {
 		switch($format) {
 			case 'png':
+				imagesavealpha($this->image, true);
 				imagepng($this->image, $file);
 				break;
-			case 'png':
+			case 'jpg':
+			case 'jpeg':
 				imagejpeg($this->image, $file);
 				break;
 			case 'gif':
@@ -147,7 +146,7 @@ class GD extends Image{
 	
 	public function rotate($angle, $bg_color = 0xffffff, $bg_opacity = 0) {
 		$rotated = imagerotate($this->image, $angle, $this->get_color($bg_color, $bg_opacity));
-		$this->enable_alpha($rotated);
+		imagealphablending($rotated, false);
 		$this->set_image($rotated, imagesx($rotated), imagesy($rotated));
 	}
 	
@@ -170,7 +169,7 @@ class GD extends Image{
 	public function overlay($layer, $x = 0, $y = 0) {
 		imagealphablending($this->image, true);
 		imagecopy($this->image, $layer->image, $x, $y, 0, 0, $layer->width, $layer->height);
-		imagealphablending($canvas, false);
+		imagealphablending($this->image, false);
 	}
 	
 	protected function draw_text($text, $size, $font_file, $x, $y, $color, $opacity, $angle) {
