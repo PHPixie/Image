@@ -2,9 +2,42 @@
 
 namespace PHPixie\Image;
 
-class GD extends Image{
+class GD extends Driver{
 
-	protected $image;
+	public $image;
+	
+	public function create($width, $height, $color = 0xffffff, $opacity = 0) {
+		$image = $this->create_gd($width, $height, $color, $opacity);
+		$this->set_image($image, $width, $height);
+		imagefilledrectangle($image, 0, 0, $width, $height, $this->get_color($color, $opacity));
+		return $this;
+	}
+	
+	public function read($file) {
+		$size = getimagesize($file);
+		
+		if (!$size)
+			throw new \Exception("File is not a valid image");
+			
+		switch($size["mime"]) {
+			case "image/png":
+				$image = imagecreatefrompng($file);
+				break;
+			case "image/jpeg":
+				$image = imagecreatefromjpeg($file);
+				break;
+			case "image/gif":
+				$image = imagecreatefromgif($file);
+				break;
+			default: 
+				throw new \Exception("File is not a valid image");
+				break;
+		}
+		
+		imagealphablending($image, false);
+		$this->set_image($image, $size[0], $size[1]);
+		return $this;
+	}
 	
 	protected function set_image($image, $width, $height) {
 		if($this->image)
@@ -15,11 +48,9 @@ class GD extends Image{
 		$this->height = $height;
 	}
 	
-	protected function create($width, $height, $force_transparency = false) {
+	protected function create_gd($width, $height) {
 		$image = imagecreatetruecolor($width, $height);
 		imagealphablending($image, false);
-		if ($force_transparency)
-			imagefilledrectangle($image, 0, 0, $width, $height, $this->get_color(0xffffff, 0));
 		return $image;
 	}
 	
@@ -32,51 +63,23 @@ class GD extends Image{
 	
 	public function get_pixel($x, $y) {
 		$pixel = imagecolorat($this->image, $x, $y);
-		echo($pixel);
 		$rgba = imagecolorsforindex($this->image, $pixel);
-		print_r(array(
-			'color' => dechex(($rgba['red'] << 16) + ($rgba['green'] << 8) + $rgba['blue']),
-			'opacity' => 1 - $rgba['alpha'] / 127
-		));
 		return array(
 			'color' => ($rgba['red'] << 16) + ($rgba['green'] << 8) + $rgba['blue'],
 			'opacity' => 1 - $rgba['alpha'] / 127
 		);
 	}
 	
-	public function read($file) {
-		$size = getimagesize($file);
-		
-		if (!$size)
-			throw new \Exception("File is not a valid image");
-			
-		switch($size["mime"]){
-			case "image/jpeg":
-				$image = imagecreatefromjpeg($file);
-				break;
-			case "image/gif":
-				$image = imagecreatefromgif($file);
-				break;
-			case "image/png":
-				$image = imagecreatefrompng($file);
-				break;
-			default: 
-				throw new \Exception("File is not a valid image");
-				break;
-		}
-		
-		imagealphablending($image, false);
-		$this->set_image($image, $size[0], $size[1]);
-		
+	protected function jpg_bg() {
+		$bg = $this->create_gd($this->width, $this->height);
+		imagefilledrectangle($bg, 0, 0, $this->width, $this->height, $this->get_color(0xffffff, 1));
+		imagealphablending($bg, true);
+		imagecopy($bg, $this->image, 0, 0, 0, 0, $this->width, $this->height);
+		imagealphablending($bg, false);
+		return $bg;
 	}
 	
-	public function blank($width, $height, $color = 0xffffff, $opacity = 0) {
-		$image = $this->create($width, $height);
-		$this->set_image($image, $width, $height);
-		imagefilledrectangle($this->image, 0, 0, $width, $height, $this->get_color($color, $opacity));
-	}
-	
-	public function render($format = 'png') {
+	public function render($format = 'png', $die = true) {
 		switch($format) {
 			case 'png':
 				header('Content-Type: image/png');
@@ -86,7 +89,9 @@ class GD extends Image{
 			case 'jpg':
 			case 'jpeg':
 				header('Content-Type: image/jpeg');
-				imagejpeg($this->image);
+				$bg = $this->jpg_bg($this->image);
+				imagejpeg($bg);
+				imagedestroy($bg);
 				break;
 			case 'gif':
 				header('Content-Type: image/gif');
@@ -95,7 +100,10 @@ class GD extends Image{
 			default:
 				throw new \Exception("Type must be either png, jpg or gif");
 		}
-		return $this;
+		
+		if($die){
+			die;
+		}
 	}
 	
 	public function save($file, $format) {
@@ -106,7 +114,9 @@ class GD extends Image{
 				break;
 			case 'jpg':
 			case 'jpeg':
-				imagejpeg($this->image, $file);
+				$bg = $this->jpg_bg($this->image);
+				imagejpeg($bg, $file);
+				imagedestroy($bg);
 				break;
 			case 'gif':
 				imagegif($this->image, $file);
@@ -129,7 +139,7 @@ class GD extends Image{
 		if ($height > ($maxheight = $this->height-$y))
 			$height = $maxheight;
 			
-		$cropped = $this->create($width, $height);
+		$cropped = $this->create_gd($width, $height);
 		imagecopy($cropped, $this->image, 0, 0, $x, $y, $width, $height);
 		$this->set_image($cropped, $width, $height);
 		return $this;
@@ -139,15 +149,17 @@ class GD extends Image{
 		$width = floor($this->width*$scale);
 		$height = floor($this->height*$scale);
 		
-		$resized = $this->create($width, $height);
+		$resized = $this->create_gd($width, $height);
 		imagecopyresampled($resized, $this->image, 0, 0, 0, 0, $width, $height, $this->width, $this->height);
 		$this->set_image($resized, $width, $height);
+		return $this;
 	}
 	
 	public function rotate($angle, $bg_color = 0xffffff, $bg_opacity = 0) {
 		$rotated = imagerotate($this->image, $angle, $this->get_color($bg_color, $bg_opacity));
 		imagealphablending($rotated, false);
 		$this->set_image($rotated, imagesx($rotated), imagesy($rotated));
+		return $this;
 	}
 	
 	public function flip($flip_x = false, $flip_y = false) {
@@ -160,7 +172,7 @@ class GD extends Image{
 		$y = $flip_y ? $this->height-1 : 0;;
 		$height = ($flip_y?-1:1) * $this->height;
 		
-		$flipped = $this->create($this->width, $this->height);
+		$flipped = $this->create_gd($this->width, $this->height);
 		imagecopyresampled($flipped, $this->image, 0, 0, $x, $y, $this->width, $this->height, $width, $height);
 		$this->set_image($flipped, $this->width, $this->height);
 		return $this;
@@ -170,13 +182,15 @@ class GD extends Image{
 		imagealphablending($this->image, true);
 		imagecopy($this->image, $layer->image, $x, $y, 0, 0, $layer->width, $layer->height);
 		imagealphablending($this->image, false);
+		return $this;
 	}
 	
 	protected function draw_text($text, $size, $font_file, $x, $y, $color, $opacity, $angle) {
+		$size = floor($size*72/96);
 		$box = $this->text_size($text, $size, $font_file);
 		
 		$rad = deg2rad($angle);
-		$offset = 0 - $box['y1'];
+		$offset = -$box['y1'];
 		$offset_x = sin($rad) * $offset;
 		$offset_y = cos($rad) * $offset;
 		
@@ -188,6 +202,7 @@ class GD extends Image{
 	}
 	
 	public function text_metrics($text, $size, $font_file) {
+		$size = floor($size*72/96);
 		$box = imagettfbbox($size, 0, $font_file, $text);
 		return array(
 			'x1'     => $box[6],
