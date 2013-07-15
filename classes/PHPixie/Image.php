@@ -2,31 +2,30 @@
 namespace PHPixie;
 
 /**
- * Validation Module for PHPixie
+ * Image Module for PHPixie.
+ * You can use this module to resize, crop and overlay images.
+ * Drawing text is also supported, together with automatic text wrapping.
+ * Implemented drivers are GD, Imagick and Gmagick.
  *
  * This module is not included by default, install it using Composer
  * by adding
  * <code>
- * 		"phpixie/validate": "2.*@dev"
+ * 		"phpixie/image": "2.*@dev"
  * </code>
  * to your requirement definition. Or download it from
- * https://github.com/dracony/PHPixie-validate
+ * https://github.com/dracony/PHPixie-Image
  * 
  * To enable it add it to your Pixie class' modules array:
  * <code>
  * 		protected $modules = array(
  * 			//Other modules ...
- * 			'validate' => '\PHPixie\Validate',
+ * 			'image' => '\PHPixie\Image',
  * 		);
  * </code>
  *
- * Methods of this class can be used to quickly validate a value. 
- * If you need to validate an array of values against different rules
- * use the Validator class.
  *
- * @see \PHPixie\Validate\Validator
- * @link https://github.com/dracony/PHPixie-validate Download this module from Github
- * @package    Validate
+ * @link https://github.com/dracony/PHPixie-Image Download this module from Github
+ * @package    Image
  */
 class Image {
 	
@@ -36,15 +35,22 @@ class Image {
 	 */
 	public $pixie;
 	
+	/**
+	 * Initializes the Image module
+	 * 
+	 * @param \PHPixie\Pixie $pixie Pixie dependency container
+	 */
 	public function __construct($pixie) {
 		$this->pixie = $pixie;
 	}
 	
 	/**
-	 * Creates a Validator instance and intializes it with input data
+	 * Reads image from file.
 	 *
-	 * @param   array  $input  Associative array of fields and values
-	 * @return  \PHPixie\Validate\Validator   Initialized Validator object
+	 * @param   string  $file  Image file
+	 * @param   string  $config Configuration name.
+	 *                        Defaults to  'default'.
+	 * @return  \PHPixie\Image\Driver Initialized Image
 	 */
 	public function read($file, $config = 'default') {
 		$driver = $this->pixie->config->get("image.{$config}.driver");
@@ -55,10 +61,15 @@ class Image {
 	}
 
 	/**
-	 * Creates a Validator instance and intializes it with input data
+	 * Creates an image filled with a single color.
 	 *
-	 * @param   array  $input  Associative array of fields and values
-	 * @return  \PHPixie\Validate\Validator   Initialized Validator object
+	 * @param   int  $width  Image width
+	 * @param   int  $height Image height
+	 * @param   int  $color  Hex representation of fill color (e.g 0xffffff)
+	 * @param   float  $color  Fill opacity (between 0 and 1)
+	 * @param   string  $config Configuration name.
+	 *                        Defaults to  'default'.
+	 * @return  \PHPixie\Image\Driver Initialized Image
 	 */
 	public function create($width, $height, $color = 0xffffff, $opacity = 0, $config = 'default') {
 		$driver = $this->pixie->config->get("image.{$config}.driver");

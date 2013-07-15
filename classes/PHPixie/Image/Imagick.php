@@ -2,14 +2,36 @@
 
 namespace PHPixie\Image;
 
+/**
+ * Imagick Image driver.
+ *
+ * @package  Image
+ */
 class Imagick extends Driver{
-
+	
+	/**
+	 * Imagick image object
+	 * @var \Imagick
+	 */
 	public $image;
 	
-	protected $image_class    = '\Imagick';
-	protected $draw_class     = '\ImagickDraw';
-	protected $pixel_class    = '\ImagickPixel';
-	protected $composite_mode =  \Imagick::COMPOSITE_OVER;
+	/**
+	 * Image class to initialize
+	 * @var string
+	 */
+	protected $image_class = '\Imagick';
+	
+	/**
+	 * Draw class to initialize
+	 * @var string
+	 */
+	protected $draw_class  = '\ImagickDraw';
+	
+	/**
+	 * Composition mode
+	 * @var int
+	 */
+	protected $composition_mode =  \Imagick::COMPOSITE_OVER;
 	
 	public function create($width, $height, $color = 0xffffff, $opacity = 0) {
 		$this->image = new $this->image_class();
@@ -24,21 +46,21 @@ class Imagick extends Driver{
 		return $this;
 	}
 	
+	/**
+	 * Updates size properties
+	 *
+	 * @param int $width  Image width
+	 * @param int $height Image height
+	 */
 	protected function update_size($width, $height) {
 		$this->width = $width;
 		$this->height = $height;
 	}
 	
-	protected function create_imagick($width, $height) {
-		$image = new $this->image_class();
-		imagealphablending($image, false);
-		return $image;
-	}
-	
 	protected function get_color($color, $opacity) {
 		$color = str_pad(dechex($color), 6, '0', \STR_PAD_LEFT);
 		$opacity = str_pad(dechex(floor(255 * $opacity)), 2, '0', \STR_PAD_LEFT);
-		return new $this->pixel_class('#'.$color.$opacity);
+		return '#'.$color.$opacity;
 	}
 	
 	public function get_pixel($x, $y) {
@@ -54,7 +76,7 @@ class Imagick extends Driver{
 	protected function jpg_bg() {
 		$bg = new $this->image_class();
 		$bg->newImage($this->width, $this->height, $this->get_color(0xffffff, 1));
-		$bg->compositeImage($this->image, $this->composite_mode, 0, 0);
+		$bg->compositeImage($this->image, $this->composition_mode, 0, 0);
 		$bg->setImageFormat('jpeg');
 		return $bg;
 	}
@@ -128,8 +150,8 @@ class Imagick extends Driver{
 	}
 	
 	public function scale($scale){
-		$width = floor($this->width*$scale);
-		$height = floor($this->height*$scale);
+		$width = ceil($this->width*$scale);
+		$height = ceil($this->height*$scale);
 		
 		$this->image->scaleImage($width, $height, true);
 		$this->update_size($width, $height);
@@ -154,7 +176,7 @@ class Imagick extends Driver{
 	public function overlay($layer, $x = 0, $y = 0) {
 		$layer_cs = $layer->image->getImageColorspace();
 		$layer->image->setImageColorspace($this->image->getImageColorspace() ); 
-		$this->image->compositeImage($layer->image, $this->composite_mode, $x, $y);
+		$this->image->compositeImage($layer->image, $this->composition_mode, $x, $y);
 		$layer->image->setImageColorspace($layer_cs);
 		
 		return $this;

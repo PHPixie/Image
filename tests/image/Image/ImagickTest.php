@@ -8,10 +8,6 @@ class Imagick_Image_Test extends Driver {
 		return new \PHPixie\Image\Imagick();
 	}
 	
-	protected function save() {
-		$this->image->save($this->files_dir.'pixie_ima.png', 'png');
-	}
-
 }
 
 	

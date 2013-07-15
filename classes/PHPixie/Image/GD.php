@@ -2,8 +2,17 @@
 
 namespace PHPixie\Image;
 
+/**
+ * GD Image driver.
+ *
+ * @package  Image
+ */
 class GD extends Driver{
 
+	/**
+	 * GD image resource
+	 * @var resource
+	 */
 	public $image;
 	
 	public function create($width, $height, $color = 0xffffff, $opacity = 0) {
@@ -39,6 +48,13 @@ class GD extends Driver{
 		return $this;
 	}
 	
+	/**
+	 * Replaces the image resource with a new image
+	 *
+	 * @param resource $image  Image resource
+	 * @param int      $width  New image width
+	 * @param int      $height New image height
+	 */
 	protected function set_image($image, $width, $height) {
 		if($this->image)
 			imagedestroy($this->image);
@@ -48,6 +64,14 @@ class GD extends Driver{
 		$this->height = $height;
 	}
 	
+	/**
+	 * Creates new GD Image
+	 *
+	 * @param int $width  Image width
+	 * @param int $height Image height
+	 *
+	 * @return resource New GD image resource 
+	 */
 	protected function create_gd($width, $height) {
 		$image = imagecreatetruecolor($width, $height);
 		imagealphablending($image, false);
@@ -70,6 +94,11 @@ class GD extends Driver{
 		);
 	}
 	
+	/**
+	 * Creates image copy with white background for saving in JPEG format
+	 *
+	 * @return resource Image on white background
+	 */
 	protected function jpg_bg() {
 		$bg = $this->create_gd($this->width, $this->height);
 		imagefilledrectangle($bg, 0, 0, $this->width, $this->height, $this->get_color(0xffffff, 1));
@@ -146,9 +175,9 @@ class GD extends Driver{
 		return $this;
 	}
 	
-	public function scale($scale){
-		$width = floor($this->width*$scale);
-		$height = floor($this->height*$scale);
+	public function scale($scale) {
+		$width = ceil($this->width*$scale);
+		$height = ceil($this->height*$scale);
 		
 		$resized = $this->create_gd($width, $height);
 		imagecopyresampled($resized, $this->image, 0, 0, 0, 0, $width, $height, $this->width, $this->height);
@@ -197,7 +226,7 @@ class GD extends Driver{
 		return $this;
 	}
 	
-	public function text_metrics($text, $size, $font_file) {
+	protected function text_metrics($text, $size, $font_file) {
 		$size = floor($size*72/96);
 		$box = imagettfbbox($size, 0, $font_file, $text);
 		return array(

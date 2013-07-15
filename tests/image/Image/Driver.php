@@ -15,7 +15,7 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$this->test_font = $this->files_dir.'Sofia-Regular.ttf';
 		$this->image = $this->getDriver();
 	}
-	/*
+	
 	public function testRead() {
 		$img = $this->image->read($this->test_png);
 		$this->assertClass($img);
@@ -49,12 +49,52 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 
 	public function testScale() {
 		$this->image->read($this->test_png);
-		$img = $this->image-> scale(0.5);
+		$img = $this->image->scale(0.5);
 		$this->assertClass($img);
 		$this->assertSize(139, 150);
 		$this->assertPixel(114, 32, 0x98fcfc, 0.5);
 		$this->assertPixel(80,26, 0xf76fae, 1);
 		
+	}
+	
+	public function testResizeFit() {
+		$this->image->read($this->test_png);
+		$img = $this->image->resize(200, 150);
+		$this->assertClass($img);
+		$this->assertSize(139, 150);
+		$this->assertPixel(124, 50, 0x93f5f5, 0.5);
+	}
+	
+	public function testResizeWidth() {
+		$this->image->read($this->test_png);
+		$img = $this->image->resize(139);
+		$this->assertClass($img);
+		$this->assertSize(139, 150);
+		$this->assertPixel(124, 50, 0x93f5f5, 0.5);
+	}
+	
+	public function testResizeHeight() {
+		$this->image->read($this->test_png);
+		$img = $this->image->resize(null, 150);
+		$this->assertClass($img);
+		$this->assertSize(139, 150);
+		$this->assertPixel(124, 50, 0x93f5f5, 0.5);
+	}
+	
+	public function testResizeFill() {
+		$this->image->read($this->test_png);
+		$img = $this->image->resize(139, 139, false);
+		$this->assertClass($img);
+		$this->assertSize(139, 150);
+		$this->assertPixel(124, 50, 0x93f5f5, 0.5);
+	}
+	
+	public function testFill() {
+		$this->image->read($this->test_png);
+		$img = $this->image->fill(139, 139, false);
+		$this->assertClass($img);
+		$this->assertSize(139, 139);
+		$this->assertPixel(124, 50, 0x93f5f5, 0.5);
 	}
 	
 	public $rotated_size;
@@ -84,7 +124,6 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$image2->read($this->test_png);
 		$image2->flip(true);
 		$img = $this->image-> overlay($image2, 10, 10);
-		$this->save();
 		$this->assertClass($img);
 		$this->assertSize(278, 300);
 		$this->assertPixel(38, 92, 0xc8ee9e, 1);
@@ -156,7 +195,6 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 	public function test_SaveJpg() {
 		$this->image->read($this->test_png);
 		$tmp = tempnam(sys_get_temp_dir(), 'test.jpg');
-		$this->save();
 		$this->image->save($tmp, 'jpeg');
 		$this->image->read($tmp);
 		$this->assertSize(278, 300);
@@ -164,7 +202,7 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$this->assertPixel(160, 52, 0xf76fb1, 1);
 		unlink($tmp);
 	}
-	*/
+	
 	public function test_SaveGuess() {
 		$this->image->read($this->test_png);
 		$tmp = sys_get_temp_dir().'/test.jpg';

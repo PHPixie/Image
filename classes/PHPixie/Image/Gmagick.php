@@ -2,10 +2,34 @@
 
 namespace PHPixie\Image;
 
+/**
+ * Gmagick Image driver.
+ *
+ * @package  Image
+ */
 class Gmagick extends Imagick{
 
-	protected $image_class    = '\Gmagick';
-	protected $draw_class     = '\GmagickDraw';
-	protected $pixel_class    = '\GmagickPixel';
-	protected $composite_mode =  \Gmagick::COMPOSITE_OVER;
+	/**
+	 * Imagick image object
+	 * @var \Gmagick
+	 */
+	public $image;
+	
+	/**
+	 * Image class to initialize
+	 * @var string
+	 */
+	protected $image_class = '\Gmagick';
+	
+	/**
+	 * Draw class to initialize
+	 * @var string
+	 */
+	protected $draw_class  = '\GmagickDraw';
+	
+	/**
+	 * Composition mode
+	 * @var int
+	 */
+	protected $composition_mode =  \Gmagick::COMPOSITE_OVER;
 }
