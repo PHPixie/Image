@@ -47,7 +47,7 @@ abstract class Driver {
 			$count = count($words);
 			foreach($words as $key => $word) {
 				$prefix = $line == ''?'':' ';
-				$box = $this->text_size($prefix.$word, $size, $font_file);
+				$box = $this->text_metrics($prefix.$word, $size, $font_file);
 				$word_width = $box['width'];
 				if ($line == '' || $line_width + $word_width < $width) {
 					$line.= $prefix.$word;
@@ -64,6 +64,13 @@ abstract class Driver {
 		return implode("\n", $lines);
 	}
 	
+	protected function get_extension($file) {
+		$ext = strtolower(pathinfo($file, \PATHINFO_EXTENSION));
+		if ($ext == 'jpg')
+			$ext = 'jpeg';
+		return $ext;
+	}
+	
 	protected function baseline_offset($size, $line_spacing) {
 		return $size * $line_spacing;
 	}
@@ -71,15 +78,17 @@ abstract class Driver {
 	public function text_size($text, $size, $font_file, $line_spacing = 1) {
 		$lines = explode("\n", $text);
 		$box = null;
-		$baseline = 0;
-		foreach($lines as $line) {
-			$line_box = $this->text_metrics($text, $size, $font_file);
+		$ascender = 0;
+		$baseline_offset = $this->baseline_offset($size, $line_spacing);
+		foreach($lines as $k=>$line) {
+			$line_box = $this->text_metrics($line, $size, $font_file);
 			if ($box == null) {
 				$box = $line_box;
+				$ascender = $line_box['ascender'];
 			}else {
 				$box['width'] = $line_box['width']>$box['width'] ? $line_box['width'] : $box['width'];
 				$box['descender'] = $line_box['descender'];
-				$box['height'] = $box['height'] - $box['descender'] + $this->baseline_offset($size, $line_spacing) + $line_box['descender'];
+				$box['height'] = $ascender + $k*$baseline_offset + $line_box['descender'];
 			}
 		}
 		return $box;
@@ -92,12 +101,12 @@ abstract class Driver {
 		$lines = explode("\n", $text);
 		$offset_x = 0;
 		$offset_y = 0;
+		$baseline = $this->baseline_offset($size, $line_spacing);
 		foreach($lines as $line){
 			$box = $this->draw_text($line, $size, $font_file, $x + $offset_x, $y + $offset_y, $color, $opacity, $angle);
-			$offset = $this->baseline_offset($size, $line_spacing);
 			$rad = deg2rad($angle);
-			$offset_x += sin($rad)*$offset;
-			$offset_y += cos($rad)*$offset;
+			$offset_x += sin($rad)*$baseline;
+			$offset_y += cos($rad)*$baseline;
 		}
 		return $this;
 	}

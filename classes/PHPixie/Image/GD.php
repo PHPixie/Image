@@ -86,7 +86,6 @@ class GD extends Driver{
 				imagesavealpha($this->image, true);
 				imagepng($this->image);
 				break;
-			case 'jpg':
 			case 'jpeg':
 				header('Content-Type: image/jpeg');
 				$bg = $this->jpg_bg($this->image);
@@ -98,7 +97,7 @@ class GD extends Driver{
 				imagegif($this->image);
 				break;
 			default:
-				throw new \Exception("Type must be either png, jpg or gif");
+				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 		
 		if($die){
@@ -106,13 +105,15 @@ class GD extends Driver{
 		}
 	}
 	
-	public function save($file, $format) {
+	public function save($file, $format = null) {
+		if ($format == null)
+			$format = $this->get_extension($file);
+			
 		switch($format) {
 			case 'png':
 				imagesavealpha($this->image, true);
 				imagepng($this->image, $file);
 				break;
-			case 'jpg':
 			case 'jpeg':
 				$bg = $this->jpg_bg($this->image);
 				imagejpeg($bg, $file);
@@ -122,7 +123,7 @@ class GD extends Driver{
 				imagegif($this->image, $file);
 				break;
 			default:
-				throw new \Exception("Type must be either png, jpg or gif");
+				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 		return $this;
 	}
@@ -186,31 +187,24 @@ class GD extends Driver{
 	}
 	
 	protected function draw_text($text, $size, $font_file, $x, $y, $color, $opacity, $angle) {
-		$size = floor($size*72/96);
-		$box = $this->text_size($text, $size, $font_file);
-		
 		$rad = deg2rad($angle);
-		$offset = -$box['y1'];
-		$offset_x = sin($rad) * $offset;
-		$offset_y = cos($rad) * $offset;
-		
+		$size = floor($size * 72 / 96);
 		$color = $this->get_color($color, $opacity);
+		
 		imagealphablending($this->image, true);
-		imagettftext($this->image, $size, $angle, $x + $offset_x, $y + $offset_y, $color, $font_file, $text);
+		imagettftext($this->image, $size, $angle, $x, $y, $color, $font_file, $text);
 		imagealphablending($this->image, false);
-		return $box;
+		return $this;
 	}
 	
 	public function text_metrics($text, $size, $font_file) {
 		$size = floor($size*72/96);
 		$box = imagettfbbox($size, 0, $font_file, $text);
 		return array(
-			'x1'     => $box[6],
-			'y1'     => $box[7],
-			'x2'     => $box[2],
-			'y2'     => $box[3],
-			'width'  => $box[2] - $box[6],
-			'height' => $box[3] - $box[7]
+			'ascender'  => -$box[7],
+			'descender' => $box[3],
+			'width'     => $box[2] - $box[6],
+			'height'    => $box[3] - $box[7]
 		);
 	}
 }

@@ -6,15 +6,20 @@ class Imagick extends Driver{
 
 	public $image;
 	
+	protected $image_class    = '\Imagick';
+	protected $draw_class     = '\ImagickDraw';
+	protected $pixel_class    = '\ImagickPixel';
+	protected $composite_mode =  \Imagick::COMPOSITE_OVER;
+	
 	public function create($width, $height, $color = 0xffffff, $opacity = 0) {
-		$this->image = new \Imagick();
+		$this->image = new $this->image_class();
 		$this->image->newImage($width, $height, $this->get_color($color, $opacity));
 		$this->update_size($width, $height);
 		return $this;
 	}
 	
 	public function read($file) {
-		$this->image = new \Imagick($file);
+		$this->image = new $this->image_class($file);
 		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight());
 		return $this;
 	}
@@ -25,15 +30,15 @@ class Imagick extends Driver{
 	}
 	
 	protected function create_imagick($width, $height) {
-		$image = new \Imagick();
+		$image = new $this->image_class();
 		imagealphablending($image, false);
 		return $image;
 	}
 	
 	protected function get_color($color, $opacity) {
 		$color = str_pad(dechex($color), 6, '0', \STR_PAD_LEFT);
-		$opacity = str_pad(dechex(floor(255*$opacity)), 2, '0', \STR_PAD_LEFT);
-		return new \ImagickPixel('#'.$color.$opacity);
+		$opacity = str_pad(dechex(floor(255 * $opacity)), 2, '0', \STR_PAD_LEFT);
+		return new $this->pixel_class('#'.$color.$opacity);
 	}
 	
 	public function get_pixel($x, $y) {
@@ -47,57 +52,61 @@ class Imagick extends Driver{
 	}
 	
 	protected function jpg_bg() {
-		$bg = $this->create_gd($this->width, $this->height);
-		imagefilledrectangle($bg, 0, 0, $this->width, $this->height, $this->get_color(0xffffff, 1));
-		imagealphablending($bg, true);
-		imagecopy($bg, $this->image, 0, 0, 0, 0, $this->width, $this->height);
-		imagealphablending($bg, false);
+		$bg = new $this->image_class();
+		$bg->newImage($this->width, $this->height, $this->get_color(0xffffff, 1));
+		$bg->compositeImage($this->image, $this->composite_mode, 0, 0);
+		$bg->setImageFormat('jpeg');
 		return $bg;
 	}
 	
 	public function render($format = 'png', $die = true) {
+		$image = $this->image;
+		
 		switch($format) {
 			case 'png':
-				header('Content-Type: image/png');
-				$this->image->setFormat('png');
+			case 'gif':
+				header('Content-Type: image/'.$format);
+				$image->setImageFormat($format);
 				break;
-			case 'jpg':
 			case 'jpeg':
 				header('Content-Type: image/jpeg');
-				$this->image->setFormat('jpeg');
-				break;
-			case 'gif':
-				header('Content-Type: image/gif');
-				$this->image->setFormat('gif');
+				$image = $this->jpg_bg($this->image);
 				break;
 			default:
-				throw new \Exception("Type must be either png, jpg or gif");
+				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 		
-		echo $this->image;
+		echo $image;
+		
 		if($die){
 			die;
 		}
+		
+		if ($format == 'jpeg')
+			$image->destroy();
 	}
 	
-	public function save($file, $format) {
+	public function save($file, $format = null) {
+		$image = $this->image;
+		if ($format == null)
+			$format = $this->get_extension($file);
 		switch($format) {
 			case 'png':
-				$this->image->setFormat('png');
-				break;
-			case 'jpg':
-			case 'jpeg':
-				$this->image->setFormat('jpeg');
-				break;
 			case 'gif':
-				$this->image->setFormat('gif');
+				$image->setImageFormat($format);
+				break;
+			case 'jpeg':
+				$image = $this->jpg_bg($this->image);
 				break;
 			default:
-				throw new \Exception("Type must be either png, jpg or gif");
+				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 		
-		$this->image->writeImage($file);
+		$image->writeImage($file);
 		
+		if ($format == 'jpeg')
+			$image->destroy();
+			
 		return $this;
 	}
 	
@@ -145,39 +154,32 @@ class Imagick extends Driver{
 	public function overlay($layer, $x = 0, $y = 0) {
 		$layer_cs = $layer->image->getImageColorspace();
 		$layer->image->setImageColorspace($this->image->getImageColorspace() ); 
-		$this->image->compositeImage($layer->image, \Imagick::COMPOSITE_DEFAULT, $x, $y);
+		$this->image->compositeImage($layer->image, $this->composite_mode, $x, $y);
 		$layer->image->setImageColorspace($layer_cs);
 		
 		return $this;
 	}
 	
 	protected function draw_text($text, $size, $font_file, $x, $y, $color, $opacity, $angle) {
-		$box = $this->text_size($text, $size, $font_file);
-		$rad = deg2rad($angle);
-		$offset = $box['ascender'];
-		$offset_x = sin($rad) * $offset;
-		$offset_y = cos($rad) * $offset;
-		
 
-		$draw = new \ImagickDraw();
+		$draw = new $this->draw_class();
 		$draw->setFont($font_file);
 		$draw->setFontSize($size);
 		$draw->setFillColor($this->get_color($color, $opacity));
-
-		$this->image->annotateImage($draw, $x + $offset_x, $y + $offset_y, $angle, $text);
-		return $box;
+		$this->image-> annotateImage($draw, $x, $y, -$angle, $text);
+		return $this;
 	}
 	
 	public function text_metrics($text, $size, $font_file) {
-		$draw = new \ImagickDraw();
+		$draw = new $this->draw_class();
 		$draw->setFont($font_file);
 		$draw->setFontSize($size);
-		$metrics = $this->image->queryFontMetrics($draw, $text, true);
+		$metrics = $this->image-> queryFontMetrics($draw, $text, true);
 		return array(
-			'ascender'  => ceil($metrics['ascender']),
-			'descender' => ceil($metrics['descender']),
-			'width'     => ceil($metrics['textWidth']),
-			'height'    => ceil($metrics['textHeight']),
+			'ascender'  => floor($metrics['boundingBox']['y2']),
+			'descender' => floor(-$metrics['boundingBox']['y1']),
+			'width'     => floor($metrics['textWidth']),
+			'height'    => floor($metrics['boundingBox']['y2'] - $metrics['boundingBox']['y1']),
 		);
 	}
 }
