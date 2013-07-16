@@ -81,7 +81,7 @@ class Imagick extends Driver{
 		return $bg;
 	}
 	
-	public function render($format = 'png', $die = true) {
+	public function render($format = 'png', $die = true, $quality = 90) {
 		$image = $this->image;
 		
 		switch($format) {
@@ -97,7 +97,7 @@ class Imagick extends Driver{
 			default:
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
-		
+		$image->setImageCompressionQuality($quality); 
 		echo $image;
 		
 		if($die){
@@ -108,7 +108,7 @@ class Imagick extends Driver{
 			$image->destroy();
 	}
 	
-	public function save($file, $format = null) {
+	public function save($file, $format = null, $quality = 90) {
 		$image = $this->image;
 		if ($format == null)
 			$format = $this->get_extension($file);
@@ -124,6 +124,7 @@ class Imagick extends Driver{
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 		
+		$image->setImageCompressionQuality($quality); 
 		$image->writeImage($file);
 		
 		if ($format == 'jpeg')

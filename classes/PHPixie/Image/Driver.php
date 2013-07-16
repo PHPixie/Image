@@ -186,10 +186,11 @@ abstract class Driver {
 	 * @param float  $opacity      Text opacity
 	 * @param int    $wrap_width   Width to wrap text at. Null means no wrapping.
 	 * @param int    $line_spacing Line spacing multiplier
+	 * @param float  $angle        Counter clockwise text rotation angle
 	 * 
 	 * @return \PHPixie\Image\Driver Returns self
 	 */
-	public function text($text, $size, $font_file, $x, $y, $color = 0x000000, $opacity = 1, $angle = 0, $wrap_width = null, $line_spacing = 1) {
+	public function text($text, $size, $font_file, $x, $y, $color = 0x000000, $opacity = 1, $wrap_width = null, $line_spacing = 1, $angle = 0) {
 		if ($wrap_width != null)
 			$text = $this->wrap_text($text, $size, $font_file, $wrap_width);
 			
@@ -242,24 +243,26 @@ abstract class Driver {
 	/**
 	 * Renders and ouputs the image.
 	 * 
-	 * @param string $format Image format (gif, png or jpeg)
-	 * @param bool   $die    Whether to stop script execution after image has been outputted.
+	 * @param string $format   Image format (gif, png or jpeg)
+	 * @param bool   $die      Whether to stop script execution after image has been outputted.
+	 * @param int    $quality  Compression quality (0 - 100)
 	 * 
 	 * @return \PHPixie\Image\Driver Returns self
 	 * @throw  \Exception  if the format is not supported
 	 */
-	public abstract function render($format = 'png', $die = true);
+	public abstract function render($format = 'png', $die = true, $quality = 90);
 	
 	/**
 	 * Saves the image to file. If $format is ommited the format is guessed based on file extension.
 	 * 
 	 * @param string $file File to save the image to.
 	 * @param string $format Image format (gif, png or jpeg)
+	 * @param int    $quality  Compression quality (0 - 100)
 	 * 
 	 * @return \PHPixie\Image\Driver Returns self
 	 * @throw  \Exception  if the format is not supported
 	 */
-	public abstract function save($file, $format = null);
+	public abstract function save($file, $format = null, $quality = 90);
 	
 	/**
 	 * Destroys the image resource.
@@ -342,6 +345,7 @@ abstract class Driver {
 	 * @param int    $y            Y coordinate of the baseline of the first line of text
 	 * @param int    $color        Text color (e.g 0xffffff)
 	 * @param float  $opacity      Text opacity
+	 * @param float  $angle        Counter clockwise text rotation angle
 	 * 
 	 * @return \PHPixie\Image\Driver Returns self
 	 */

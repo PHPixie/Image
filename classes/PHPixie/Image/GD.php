@@ -108,7 +108,7 @@ class GD extends Driver{
 		return $bg;
 	}
 	
-	public function render($format = 'png', $die = true) {
+	public function render($format = 'png', $die = true, $quality = 90) {
 		switch($format) {
 			case 'png':
 				header('Content-Type: image/png');
@@ -118,7 +118,7 @@ class GD extends Driver{
 			case 'jpeg':
 				header('Content-Type: image/jpeg');
 				$bg = $this->jpg_bg($this->image);
-				imagejpeg($bg);
+				imagejpeg($bg, null, $quality);
 				imagedestroy($bg);
 				break;
 			case 'gif':
@@ -134,7 +134,7 @@ class GD extends Driver{
 		}
 	}
 	
-	public function save($file, $format = null) {
+	public function save($file, $format = null, $quality = 90) {
 		if ($format == null)
 			$format = $this->get_extension($file);
 			
@@ -145,7 +145,7 @@ class GD extends Driver{
 				break;
 			case 'jpeg':
 				$bg = $this->jpg_bg($this->image);
-				imagejpeg($bg, $file);
+				imagejpeg($bg, $file, $quality);
 				imagedestroy($bg);
 				break;
 			case 'gif':

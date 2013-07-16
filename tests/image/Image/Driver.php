@@ -158,7 +158,7 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$this->assertClass($img);
 		$this->assertPixel(101, 73, 0xfc6f67, 1);
 		$this->assertPixel(61, 85, 0xff0000, 0.5);
-		$img = $this->image-> text("hello\ntest\nme", 40, $this->test_font, 10, 54, 0xff0000, 0.5, 0, null, 3);
+		$img = $this->image-> text("hello\ntest\nme", 40, $this->test_font, 10, 54, 0xff0000, 0.5, null, 3);
 		$this->assertClass($img);
 		$this->assertPixel(26, 167, 0xff0000, 0.5);
 		$this->assertPixel(32, 284, 0xfc6d64, 1);
@@ -166,7 +166,7 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 
 	public function test_TextAngle() {
 		$this->image->read($this->test_png);
-		$img = $this->image-> text("hello\nworld\nhi", 40, $this->test_font, 40, 70, 0xff0000, 0.5, 45);
+		$img = $this->image-> text("hello\nworld\nhi", 40, $this->test_font, 40, 70, 0xff0000, 0.5, null, 1, 45);
 		$this->assertClass($img);
 		$this->assertPixel(61, 88, 0xff0000, 0.5);
 		$this->assertPixel(97, 54, 0xfb695f, 1);
@@ -174,7 +174,7 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 	
 	public function test_TextWrap() {
 		$this->image->read($this->test_png);
-		$img = $this->image->text("Tinkerbell is a magical fairy that enjoys picking flowers and singing songs in the forest.\nShe also has a friend named Trixie", 20, $this->test_font, 27, 70, 0xff0000, 0.5, 0, 258,1.4);
+		$img = $this->image->text("Tinkerbell is a magical fairy that enjoys picking flowers and singing songs in the forest.\nShe also has a friend named Trixie", 20, $this->test_font, 27, 70, 0xff0000, 0.5, 258,1.4);
 		$this->assertClass($img);
 		$this->assertPixel(40, 175, 0xff0000, 0.5);
 		$this->assertPixel(104, 120, 0xfa796d, 1);
