@@ -229,6 +229,15 @@ abstract class Driver {
 	public abstract function read($file);
 	
 	/**
+	 * Loads image data from a bytestring.
+	 *
+	 * @param   string  $bytes  Image data
+	 *
+	 * @return  \PHPixie\Image\Driver Initialized Image
+	 */
+	public abstract function load($bytes);
+	
+	/**
 	 * Gets color of the pixel at specifed coordinates.
 	 * 
 	 * Returns array with 'color' and 'opacity' keys

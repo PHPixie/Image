@@ -48,6 +48,13 @@ class GD extends Driver{
 		return $this;
 	}
 	
+	public function load($bytes) {
+		$image = imagecreatefromstring($bytes);
+		imagealphablending($image, false);
+		$this->set_image($image, imagesx($image), imagesy($image));
+		return $this;	
+	}
+	
 	/**
 	 * Replaces the image resource with a new image
 	 *

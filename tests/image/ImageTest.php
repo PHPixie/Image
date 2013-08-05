@@ -21,6 +21,17 @@ class Image_Test extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(0.5, round($pixel['opacity'],1));
 	}
 	
+	public function testLoad() {
+		$bytes = file_get_contents(dirname(__DIR__).'/files/pixie.png');
+		$im = $this->image->load($bytes);
+		$this->assertEquals(true, $im instanceof \PHPixie\Image\GD);
+		$this->assertEquals(278, $im->width);
+		$this->assertEquals(300, $im->height);
+		$pixel = $im->get_pixel(228, 64);
+		$this->assertEquals(0x98fcfc, $pixel['color']);
+		$this->assertEquals(0.5, round($pixel['opacity'],1));
+	}
+	
 	public function testCreate(){
 		$im = $this->image->create(300, 200, 0xffffff, 0.5, 'imagick');
 		$this->assertEquals(true, $im instanceof \PHPixie\Image\Imagick);

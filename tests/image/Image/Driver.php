@@ -24,6 +24,15 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$this->assertPixel(160, 52, 0xf76fae, 1);
 	}
 	
+	public function testLoad() {
+		$bytes = file_get_contents($this->test_png);
+		$img = $this->image->load($bytes);
+		$this->assertClass($img);
+		$this->assertSize(278, 300);
+		$this->assertPixel(228, 64, 0x98fcfc, 0.5);
+		$this->assertPixel(160, 52, 0xf76fae, 1);
+	}
+		
 	public function testCreate() {
 		$img = $this->image-> create(200, 300);
 		$this->assertClass($img);

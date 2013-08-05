@@ -46,6 +46,13 @@ class Imagick extends Driver{
 		return $this;
 	}
 	
+	public function load($bytes) {
+		$this->image = new $this->image_class();
+		$this->image->readImageBlob($bytes);
+		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight());
+		return $this;
+	}
+	
 	/**
 	 * Updates size properties
 	 *
