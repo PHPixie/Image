@@ -43,7 +43,6 @@ class Imagick extends Driver{
 	
 	public function read($file) {
 		$this->image = new $this->image_class($file);
-		$this->format = strtolower($this->image->getImageFormat());
 		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight(), true);
 		return $this;
 	}
@@ -67,8 +66,8 @@ class Imagick extends Driver{
 		$this->height = $height;
 		if ($get_format) {
 			$this->format = strtolower($this->image->getImageFormat());
-			if ($this->format == 'jpeg')
-				$this->format = 'jpg';
+			if ($this->format == 'jpg')
+				$this->format = 'jpeg';
 		}
 	}
 	
