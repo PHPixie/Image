@@ -37,19 +37,21 @@ class Imagick extends Driver{
 		$this->image = new $this->image_class();
 		$this->image->newImage($width, $height, $this->get_color($color, $opacity));
 		$this->update_size($width, $height);
+		$this->format = 'png';
 		return $this;
 	}
 	
 	public function read($file) {
 		$this->image = new $this->image_class($file);
-		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight());
+		$this->format = strtolower($this->image->getImageFormat());
+		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight(), true);
 		return $this;
 	}
 	
 	public function load($bytes) {
 		$this->image = new $this->image_class();
 		$this->image->readImageBlob($bytes);
-		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight());
+		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight(), true);
 		return $this;
 	}
 	
@@ -58,10 +60,16 @@ class Imagick extends Driver{
 	 *
 	 * @param int $width  Image width
 	 * @param int $height Image height
+	 * @param bool $format Whether to get image format 
 	 */
-	protected function update_size($width, $height) {
+	protected function update_size($width, $height, $get_format = false) {
 		$this->width = $width;
 		$this->height = $height;
+		if ($get_format) {
+			$this->format = strtolower($this->image->getImageFormat());
+			if ($this->format == 'jpeg')
+				$this->format = 'jpg';
+		}
 	}
 	
 	protected function get_color($color, $opacity) {

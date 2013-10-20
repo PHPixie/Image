@@ -23,6 +23,12 @@ abstract class Driver {
 	public $height;
 	
 	/**
+	 * Image format
+	 * @var int
+	 */
+	public $format;
+	
+	/**
 	 * Resizes the image to either fit specified dimensions or to fill them (based on the $fit parameter).
 	 *
 	 * If only the width or height is provided the image will be resized according to that single dimension.
