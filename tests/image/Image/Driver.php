@@ -165,8 +165,8 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$this->image->read($this->test_png);
 		$img = $this->image-> text("hello\nworld", 40, $this->test_font, 10, 54, 0xff0000, 0.5);
 		$this->assertClass($img);
-		$this->assertPixel(101, 73, 0xfc6f67, 1);
-		$this->assertPixel(61, 85, 0xff0000, 0.5);
+		$this->assertPixel(101, 73, 0xfb867c, 1);
+		$this->assertPixel(61, 85, 0x6f7172, 0);
 		$img = $this->image-> text("hello\ntest\nme", 40, $this->test_font, 10, 54, 0xff0000, 0.5, null, 3);
 		$this->assertClass($img);
 		$this->assertPixel(26, 167, 0xff0000, 0.5);
@@ -185,8 +185,8 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$this->image->read($this->test_png);
 		$img = $this->image->text("Tinkerbell is a magical fairy that enjoys picking flowers and singing songs in the forest.\nShe also has a friend named Trixie", 20, $this->test_font, 27, 70, 0xff0000, 0.5, 258,1.4);
 		$this->assertClass($img);
-		$this->assertPixel(40, 175, 0xff0000, 0.5);
-		$this->assertPixel(104, 120, 0xfa796d, 1);
+		$this->assertPixel(40, 175, 0xf8dcca, 0);
+		$this->assertPixel(104, 120, 0xfb695e, 1);
 	}
 	
 	
@@ -251,7 +251,11 @@ abstract class Driver extends PHPUnit_Framework_TestCase{
 		$dr = abs((($tcolor >> 16) & 0xFF) - (($color >> 16) & 0xFF));
 		$dg = abs((($tcolor >> 8) & 0xFF) - (($color >> 8) & 0xFF));
 		$db = abs(($tcolor & 0xFF) - ($color & 0xFF));
-		
+		if (6 < max($dr, $db, $dg)) {
+            echo($color);
+            print_r([$x, $y,$pixel]);
+
+        }
 		$this->assertEquals(true, 6 > max($dr, $db, $dg));
 		$this->assertEquals($opacity, round($pixel['opacity'],1));
 	}
