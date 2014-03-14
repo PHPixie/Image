@@ -48,7 +48,7 @@ abstract class Driver {
 		if ($width && $height) {
 			$wscale = $width / $this->width;
 			$hscale = $height / $this-> height;
-			$scale = ($fit && $wscale>$hscale) ? $hscale : $wscale;
+			$scale = $fit ? min($wscale, $hscale) : max($wscale, $hscale);
 		}elseif($width) {
 			$scale = $width/$this->width;
 		}elseif($height) {
