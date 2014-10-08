@@ -148,7 +148,10 @@ class Imagick extends Driver{
 	}
 	
 	public function destroy() {
-		$this->image->destroy();
+		if($this->image !== null) {
+			$this->image->destroy();
+			$this->image = null;
+		}
 	}
 	
 	public function crop($width, $height, $x = 0, $y = 0) {
