@@ -170,8 +170,10 @@ class GD extends Driver{
 	}
 	
 	public function destroy() {
-		imagedestroy($this->image);
-		$this->image = null;
+		if($this->image !== null) {
+			imagedestroy($this->image);
+			$this->image = null;
+		}
 	}
 	
 	public function crop($width, $height, $x = 0, $y = 0) {
