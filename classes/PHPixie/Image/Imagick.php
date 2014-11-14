@@ -8,31 +8,37 @@ namespace PHPixie\Image;
  * @package  Image
  */
 class Imagick extends Driver{
-	
+
 	/**
 	 * Imagick image object
 	 * @var \Imagick
 	 */
 	public $image;
-	
+
 	/**
 	 * Image class to initialize
 	 * @var string
 	 */
 	protected $image_class = '\Imagick';
-	
+
 	/**
 	 * Draw class to initialize
 	 * @var string
 	 */
 	protected $draw_class  = '\ImagickDraw';
-	
+
 	/**
 	 * Composition mode
 	 * @var int
 	 */
 	protected $composition_mode =  \Imagick::COMPOSITE_OVER;
-	
+
+	/**
+	 * Set Compression Quality function
+	 * @var string
+	 */
+	protected $set_compression_quality = 'setImageCompressionQuality';
+
 	public function create($width, $height, $color = 0xffffff, $opacity = 0) {
 		$this->image = new $this->image_class();
 		$this->image->newImage($width, $height, $this->get_color($color, $opacity));
@@ -40,26 +46,26 @@ class Imagick extends Driver{
 		$this->format = 'png';
 		return $this;
 	}
-	
+
 	public function read($file) {
 		$this->image = new $this->image_class($file);
 		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight(), true);
 		return $this;
 	}
-	
+
 	public function load($bytes) {
 		$this->image = new $this->image_class();
 		$this->image->readImageBlob($bytes);
 		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight(), true);
 		return $this;
 	}
-	
+
 	/**
 	 * Updates size properties
 	 *
 	 * @param int $width  Image width
 	 * @param int $height Image height
-	 * @param bool $format Whether to get image format 
+	 * @param bool $format Whether to get image format
 	 */
 	protected function update_size($width, $height, $get_format = false) {
 		$this->width = $width;
@@ -70,13 +76,13 @@ class Imagick extends Driver{
 				$this->format = 'jpeg';
 		}
 	}
-	
+
 	protected function get_color($color, $opacity) {
 		$color = str_pad(dechex($color), 6, '0', \STR_PAD_LEFT);
 		$opacity = str_pad(dechex(floor(255 * $opacity)), 2, '0', \STR_PAD_LEFT);
 		return '#'.$color.$opacity;
 	}
-	
+
 	public function get_pixel($x, $y) {
 		$pixel = $this->image-> getImagePixelColor($x, $y);
 		$color = $pixel->getColor();
@@ -86,7 +92,7 @@ class Imagick extends Driver{
 			'opacity' => $normalized_color['a']
 		);
 	}
-	
+
 	protected function jpg_bg() {
 		$bg = new $this->image_class();
 		$bg->newImage($this->width, $this->height, $this->get_color(0xffffff, 1));
@@ -94,10 +100,10 @@ class Imagick extends Driver{
 		$bg->setImageFormat('jpeg');
 		return $bg;
 	}
-	
+
 	public function render($format = 'png', $die = true, $quality = 90) {
 		$image = $this->image;
-		
+
 		switch($format) {
 			case 'png':
 			case 'gif':
@@ -111,17 +117,17 @@ class Imagick extends Driver{
 			default:
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
-		$image->setImageCompressionQuality($quality); 
+		$image->{$this->set_compression_quality}($quality);
 		echo $image;
-		
+
 		if($die){
 			die;
 		}
-		
+
 		if ($format == 'jpeg')
 			$image->destroy();
 	}
-	
+
 	public function save($file, $format = null, $quality = 90) {
 		$image = $this->image;
 		if ($format == null)
@@ -137,69 +143,69 @@ class Imagick extends Driver{
 			default:
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
-		
-		$image->setImageCompressionQuality($quality); 
+
+		$image->{$this->set_compression_quality}($quality);
 		$image->writeImage($file);
-		
+
 		if ($format == 'jpeg')
 			$image->destroy();
-			
+
 		return $this;
 	}
-	
+
 	public function destroy() {
 		if($this->image !== null) {
 			$this->image->destroy();
 			$this->image = null;
 		}
 	}
-	
+
 	public function crop($width, $height, $x = 0, $y = 0) {
 		if ($width > ($maxwidth = $this->width-$x))
 			$width = $maxwidth;
-		
+
 		if ($height > ($maxheight = $this->height-$y))
 			$height = $maxheight;
-			
+
 		$this->image->cropImage($width, $height, $x, $y);
 		$this->update_size($width, $height);
-		
+
 		return $this;
 	}
-	
+
 	public function scale($scale){
 		$width = ceil($this->width*$scale);
 		$height = ceil($this->height*$scale);
-		
+
 		$this->image->scaleImage($width, $height, true);
 		$this->update_size($width, $height);
 		return $this;
 	}
-	
+
 	public function rotate($angle, $bg_color = 0xffffff, $bg_opacity = 0) {
 		$this->image->rotateImage($this->get_color($bg_color, $bg_opacity), -$angle);
 		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight());
 		return $this;
 	}
-	
+
 	public function flip($flip_x = false, $flip_y = false) {
 		if ($flip_x)
 			$this->image->flopImage();
 		if ($flip_y)
 			$this->image->flipImage();
-			
+
 		return $this;
 	}
-	
+
 	public function overlay($layer, $x = 0, $y = 0) {
 		$layer_cs = $layer->image->getImageColorspace();
-		$layer->image->setImageColorspace($this->image->getImageColorspace() ); 
+		$layer->image->setImageColorspace($this->image->getImageColorspace() );
 		$this->image->compositeImage($layer->image, $this->composition_mode, $x, $y);
 		$layer->image->setImageColorspace($layer_cs);
-		
+
 		return $this;
 	}
-	
+
 	protected function draw_text($text, $size, $font_file, $x, $y, $color, $opacity, $angle) {
 
 		$draw = new $this->draw_class();
@@ -209,7 +215,7 @@ class Imagick extends Driver{
 		$this->image-> annotateImage($draw, $x, $y, -$angle, $text);
 		return $this;
 	}
-	
+
 	public function text_metrics($text, $size, $font_file) {
 		$draw = new $this->draw_class();
 		$draw->setFont($font_file);

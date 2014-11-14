@@ -33,54 +33,9 @@ class Gmagick extends Imagick{
 	 */
 	protected $composition_mode =  \Gmagick::COMPOSITE_OVER;
 
-	public function save($file, $format = null, $quality = 90) {
-		$image = $this->image;
-		if ($format == null)
-			$format = $this->get_extension($file);
-		switch($format) {
-			case 'png':
-			case 'gif':
-				$image->setImageFormat($format);
-				break;
-			case 'jpeg':
-				$image = $this->jpg_bg($this->image);
-				break;
-			default:
-				throw new \Exception("Type must be either png, jpeg or gif");
-		}
-
-		$image->setCompressionQuality($quality);
-		$image->writeImage($file);
-
-		if ($format == 'jpeg')
-			$image->destroy();
-
-		return $this;
-	}
-
-	public function render($format = 'png', $die = true, $quality = 90) {
-		$image = $this->image;
-		switch($format) {
-			case 'png':
-			case 'gif':
-				header('Content-Type: image/'.$format);
-				$image->setImageFormat($format);
-				break;
-			case 'jpeg':
-				header('Content-Type: image/jpeg');
-				$image = $this->jpg_bg($this->image);
-				break;
-			default:
-				throw new \Exception("Type must be either png, jpeg or gif");
-		}
-		$image->setCompressionQuality($quality);
-		echo $image;
-
-		if($die){
-			die;
-		}
-
-		if ($format == 'jpeg')
-			$image->destroy();
-	}
+	/**
+	 * Set Compression Quality function
+	 * @var string
+	 */
+	protected $set_compression_quality = 'setCompressionQuality';
 }
