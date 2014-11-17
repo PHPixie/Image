@@ -32,10 +32,8 @@ class Gmagick extends Imagick{
 	 * @var int
 	 */
 	protected $composition_mode =  \Gmagick::COMPOSITE_OVER;
-
-	/**
-	 * Set Compression Quality function
-	 * @var string
-	 */
-	protected $set_compression_quality = 'setCompressionQuality';
+    
+    protected function set_quality($quality) {
+        $this->image->setCompressionQuality($quality);
+    }
 }

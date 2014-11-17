@@ -33,13 +33,8 @@ class Imagick extends Driver{
 	 */
 	protected $composition_mode =  \Imagick::COMPOSITE_OVER;
 
-	/**
-	 * Set Compression Quality function
-	 * @var string
-	 */
-	protected $set_compression_quality = 'setImageCompressionQuality';
 
-	public function create($width, $height, $color = 0xffffff, $opacity = 0) {
+    public function create($width, $height, $color = 0xffffff, $opacity = 0) {
 		$this->image = new $this->image_class();
 		$this->image->newImage($width, $height, $this->get_color($color, $opacity));
 		$this->update_size($width, $height);
@@ -117,7 +112,7 @@ class Imagick extends Driver{
 			default:
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
-		$image->{$this->set_compression_quality}($quality);
+		$this->set_quality($quality);
 		echo $image;
 
 		if($die){
@@ -144,7 +139,7 @@ class Imagick extends Driver{
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 
-		$image->{$this->set_compression_quality}($quality);
+		$this->set_quality($quality);
 		$image->writeImage($file);
 
 		if ($format == 'jpeg')
@@ -228,4 +223,15 @@ class Imagick extends Driver{
 			'height'    => floor($metrics['boundingBox']['y2'] - $metrics['boundingBox']['y1']),
 		);
 	}
+    
+	/**
+	 * Set Compression Quality
+     *
+	 * @params integer $quality Compression quality
+	 * 
+     * @return void
+	 */
+    protected function set_quality($quality) {
+        $this->image->setImageCompressionQuality($quality);
+    }
 }
