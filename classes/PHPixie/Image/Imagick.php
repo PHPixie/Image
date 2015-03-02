@@ -60,7 +60,7 @@ class Imagick extends Driver{
 	 *
 	 * @param int $width  Image width
 	 * @param int $height Image height
-	 * @param bool $format Whether to get image format
+	 * @param bool $get_format Whether to get image format
 	 */
 	protected function update_size($width, $height, $get_format = false) {
 		$this->width = $width;
@@ -113,7 +113,7 @@ class Imagick extends Driver{
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 		$this->set_quality($quality);
-		echo $image;
+		echo $image->getImagesBlob();
 
 		if($die){
 			die;
@@ -139,8 +139,12 @@ class Imagick extends Driver{
 				throw new \Exception("Type must be either png, jpeg or gif");
 		}
 
-		$this->set_quality($quality);
-		$image->writeImage($file);
+		if ($format == 'gif' && $this->multiframe()) {
+			$image->writeImages($file, true);
+		} else {
+			$this->set_quality($quality);
+			$image->writeImage($file);
+		}
 
 		if ($format == 'jpeg')
 			$image->destroy();
@@ -162,7 +166,15 @@ class Imagick extends Driver{
 		if ($height > ($maxheight = $this->height-$y))
 			$height = $maxheight;
 
-		$this->image->cropImage($width, $height, $x, $y);
+		if ($this->multiframe()) {
+			$this->image = $this->image->coalesceImages();
+			foreach ($this->image as $frame) {
+				$frame->cropImage($width, $height, $x, $y);
+				$frame->setImagePage($width, $height, 0, 0);
+			}
+		} else {
+			$this->image->cropImage($width, $height, $x, $y);
+		}
 		$this->update_size($width, $height);
 
 		return $this;
@@ -172,22 +184,57 @@ class Imagick extends Driver{
 		$width = ceil($this->width*$scale);
 		$height = ceil($this->height*$scale);
 
-		$this->image->scaleImage($width, $height, true);
+		if ($this->multiframe()) {
+			$this->image = $this->image->coalesceImages();
+			foreach ($this->image as $frame) {
+				$frame->scaleImage($width, $height, true);
+				$frame->setImagePage($width, $height, 0, 0);
+			}
+		} else {
+			$this->image->scaleImage($width, $height, true);
+		}
 		$this->update_size($width, $height);
 		return $this;
 	}
 
 	public function rotate($angle, $bg_color = 0xffffff, $bg_opacity = 0) {
-		$this->image->rotateImage($this->get_color($bg_color, $bg_opacity), -$angle);
+		if ($this->multiframe()) {
+			foreach ($this->image as $frame) {
+				$frame->rotateImage(
+					$this->get_color($bg_color, $bg_opacity), -$angle
+				);
+				$frame->setImagePage(
+					$this->image->width, $this->image->height, 0, 0
+				);
+			}
+		} else {
+			$this->image->rotateImage(
+				$this->get_color($bg_color, $bg_opacity), -$angle
+			);
+		}
 		$this->update_size($this->image->getImageWidth(), $this->image->getImageHeight());
 		return $this;
 	}
 
 	public function flip($flip_x = false, $flip_y = false) {
-		if ($flip_x)
-			$this->image->flopImage();
-		if ($flip_y)
-			$this->image->flipImage();
+		if ($flip_x) {
+			if ($this->multiframe()) {
+				foreach ($this->image as $frame) {
+					$frame->flopImage();
+				}
+			} else {
+				$this->image->flopImage();
+			}
+		}
+		if ($flip_y) {
+			if ($this->multiframe()) {
+				foreach ($this->image as $frame) {
+					$frame->flipImage();
+				}
+			} else {
+				$this->image->flipImage();
+			}
+		}
 
 		return $this;
 	}
@@ -207,7 +254,14 @@ class Imagick extends Driver{
 		$draw->setFont($font_file);
 		$draw->setFontSize($size);
 		$draw->setFillColor($this->get_color($color, $opacity));
-		$this->image-> annotateImage($draw, $x, $y, -$angle, $text);
+		if ($this->multiframe()) {
+			$this->image = $this->image->coalesceImages();
+			foreach ($this->image as $frame) {
+				$frame->annotateImage($draw, $x, $y, -$angle, $text);
+			}
+		} else {
+			$this->image->annotateImage($draw, $x, $y, -$angle, $text);
+		}
 		return $this;
 	}
 
@@ -227,11 +281,23 @@ class Imagick extends Driver{
 	/**
 	 * Set Compression Quality
      *
-	 * @params integer $quality Compression quality
+	 * @param integer $quality Compression quality
 	 * 
      * @return void
 	 */
-    protected function set_quality($quality) {
-        $this->image->setImageCompressionQuality($quality);
-    }
+	protected function set_quality($quality) {
+		$this->image->setImageCompressionQuality($quality);
+	}
+
+	/**
+	 * Returns true if image has many frames
+	 *
+	 * @return bool
+	 */
+	protected function multiframe() {
+		if ($this->image) {
+			return (bool)$this->image->getImageIterations();
+		}
+	}
+
 }
