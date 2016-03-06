@@ -28,4 +28,11 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
     protected function setQuality($quality) {
         $this->image->setCompressionQuality($quality);
     }
+    
+    protected function getPixelAt($x, $y)
+    {
+        $image = clone $this->image;
+        $image->cropImage(1, 1, $x, $y);
+        return $image->getImageHistogram()[0]
+    }
 }

@@ -64,13 +64,18 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 	}
 
 	public function getPixel($x, $y) {
-		$pixel = $this->image->getImagePixelColor($x, $y);
+		$pixel = $this->getPixelAt($x, $y);
 		$color = $pixel->getColor();
 		$normalizedColor = $pixel->getColor(true);
 		$color = ($color['r'] << 16) + ($color['g'] << 8) + $color['b'];
         $opacity = $normalizedColor['a'];
         return $this->buildPixel($x, $y, $color, $opacity);
 	}
+    
+    protected function getPixelAt($x, $y)
+    {
+        return $this->image->getImagePixelColor($x, $y);
+    }
 
 	protected function jpgBg() {
 		$bg = new $this->imageClass();
