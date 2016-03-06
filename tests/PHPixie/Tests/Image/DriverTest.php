@@ -159,6 +159,9 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 		$img = $this->image->create(300, 300);
 		$this->assertClass($img);
 		$size = $img->textSize("hello\nworld", 40, $this->testFont);
+        if($this->dryRun) {
+            return;
+        }
 		$this->assertEquals(true, 6 > abs(101-$size['width']));
 		$this->assertEquals(true, 6 > abs(75-$size['height']));
 	}
