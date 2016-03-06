@@ -1,5 +1,5 @@
 <?php
-//somerandomemailIdontcarereally123@dispostable.com
+
 namespace PHPixie\Tests\Image;
 
 abstract class DriverTest extends \PHPixie\Test\Testcase{
@@ -12,7 +12,7 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
     
     protected $driver;
     protected $rotatedSize;
-    protected $supportsAlpha = true;
+    protected $dryRun = false
 	
 	protected function setUp() {
 		$this->filesDir = realpath(__DIR__.'/../../../files/').'/';
@@ -167,8 +167,7 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 		$img = $this->image->read($this->testPng);
 		$img->text("hello\nworld", 40, $this->testFont, 10, 54, 0xff0000, 0.5);
 		$this->assertClass($img);
-		$this->assertPixel($img, 101, 73, 0xfb867c, 1);
-		$this->assertPixel($img, 61, 85, 0x6f7172, 0);
+		$this->assertPixel($img, 13, 40, 0xff0000, 0.5);
 		$img->text("hello\ntest\nme", 40, $this->testFont, 10, 54, 0xff0000, 0.5, null, 3);
 		$this->assertClass($img);
 		$this->assertPixel($img, 26, 167, 0xff0000, 0.5);
@@ -189,8 +188,7 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 		$img = $this->image->read($this->testPng);
 		$img->text($text, 20, $this->testFont, 27, 70, 0xff0000, 0.5, 258, 1.4);
 		$this->assertClass($img);
-		$this->assertPixel($img, 40, 175, 0xf8dcca, 0);
-		$this->assertPixel($img, 104, 120, 0xfb695e, 1);
+		$this->assertPixel($img, 34, 61, 0xff0000, 0.5);
 	}
 	
 	
@@ -253,6 +251,9 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 	protected function assertPixel($img, $x, $y, $color, $opacity) {
 		$pixel = $img->getPixel($x, $y);
 		$tcolor = $pixel->color();
+        if($this->dryRun) {
+            return;
+        }
 		$dr = abs((($tcolor >> 16) & 0xFF) - (($color >> 16) & 0xFF));
 		$dg = abs((($tcolor >> 8) & 0xFF) - (($color >> 8) & 0xFF));
 		$db = abs(($tcolor & 0xFF) - ($color & 0xFF));
@@ -262,8 +263,6 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 
         }
 		$this->assertEquals(true, 6 > max($dr, $db, $dg));
-        if($this->supportsAlpha) {
-            $this->assertEquals($opacity, round($pixel->opacity(), 1));
-        }
+        $this->assertEquals($opacity, round($pixel->opacity(), 1));
 	}
 }
