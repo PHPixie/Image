@@ -17,10 +17,5 @@
     },
     "autoload": {
         "psr-0": {"PHPixie": "classes/"}
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.x-dev"
-        }
     }
 }
