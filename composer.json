@@ -1,7 +1,7 @@
 {
-    "name": "phpixie/image",
-    "description": "PHPixie Image library",
-    "keywords": ["image", "gd", "imagick", "gmagick"],
+    "name": "phpixie/image
+    "description": "PHPixie imageprocessing library",
+    "keywords": ["image", "gd", "imagick", "gmagick", "imagemagick"],
     "homepage": "http://phpixie.com",
     "type": "library",
     "license": "BSD",
@@ -23,7 +23,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "3.x-dev"
         }
     }
 }
