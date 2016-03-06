@@ -29,10 +29,15 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
         $this->image->setCompressionQuality($quality);
     }
     
-    protected function getPixelAt($x, $y)
-    {
-        $image = clone $this->image;
+	public function getPixel($x, $y) {
+		$image = clone $this->image;
         $image->cropImage(1, 1, $x, $y);
-        return $image->getImageHistogram()[0];
-    }
+        $pixel = $image->getImageHistogram()[0];
+        
+		$color = $pixel->getColor(true);
+		$normalizedColor = $pixel->getColor(true, true);
+		$color = ($color['r'] << 16) + ($color['g'] << 8) + $color['b'];
+        $opacity = $normalizedColor['a'];
+        return $this->buildPixel($x, $y, $color, $opacity);
+	}
 }

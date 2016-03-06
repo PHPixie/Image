@@ -64,7 +64,7 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 	}
 
 	public function getPixel($x, $y) {
-		$pixel = $this->getPixelAt($x, $y);
+		$pixel = $this->image->getImagePixelColor($x, $y);
 		$color = $pixel->getColor();
 		$normalizedColor = $pixel->getColor(true);
 		$color = ($color['r'] << 16) + ($color['g'] << 8) + $color['b'];
@@ -72,11 +72,6 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
         return $this->buildPixel($x, $y, $color, $opacity);
 	}
     
-    protected function getPixelAt($x, $y)
-    {
-        return $this->image->getImagePixelColor($x, $y);
-    }
-
 	protected function jpgBg() {
 		$bg = new $this->imageClass();
 		$bg->newImage($this->width, $this->height, $this->getColor(0xffffff, 1));
@@ -85,7 +80,7 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 		return $bg;
 	}
 
-	public function render($format = 'png', $quality = 90) {
+	public function render($format = 'png', $quality = 90, $destroy = true) {
 		$image = $this->image;
 
 		switch($format) {
@@ -114,20 +109,15 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 			case 'gif':
 				$image->setImageFormat($format);
 				break;
-			case 'jpeg':
+			case 'jpg':
 				$image = $this->jpgBg($this->image);
 				break;
 			default:
-				throw new \Exception("Type must be either png, jpeg or gif");
+				throw new \Exception("Type must be either png, jpg or gif");
 		}
 
 		$this->setQuality($quality);
 		$image->writeImage($file);
-
-		if ($format == 'jpeg')
-			$image->destroy();
-
-		return $this;
 	}
 
 	public function destroy() {
