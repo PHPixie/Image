@@ -33,6 +33,6 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
     {
         $image = clone $this->image;
         $image->cropImage(1, 1, $x, $y);
-        return $image->getImageHistogram()[0]
+        return $image->getImageHistogram()[0];
     }
 }
