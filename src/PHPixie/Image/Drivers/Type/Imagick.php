@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\Image\Drivers\;
+namespace PHPixie\Image\Drivers\Type;
 
 /**
  * Imagick Image driver.
