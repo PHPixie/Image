@@ -40,4 +40,10 @@ class Imagick implements \PHPixie\Image\Drivers\Driver
     {
         return new Imagick\Resource($image, $width, $height, $format);
     }
+    
+	protected function getColor($color, $opacity) {
+		$color = str_pad(dechex($color), 6, '0', \STR_PAD_LEFT);
+		$opacity = str_pad(dechex(floor(255 * $opacity)), 2, '0', \STR_PAD_LEFT);
+		return '#'.$color.$opacity;
+	}
 }

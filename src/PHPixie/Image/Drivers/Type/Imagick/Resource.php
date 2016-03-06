@@ -66,10 +66,9 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 		$pixel = $this->image->getImagePixelColor($x, $y);
 		$color = $pixel->getColor();
 		$normalizedColor = $pixel->getColor(true);
-		return array(
-			'color' => ($color['r'] << 16) + ($color['g'] << 8) + $color['b'],
-			'opacity' => $normalizedColor['a']
-		);
+		$color = ($color['r'] << 16) + ($color['g'] << 8) + $color['b'];
+        $opacity = $normalizedColor['a'];
+        return $this->buildPixel($x, $y, $color, $opacity);
 	}
 
 	protected function jpgBg() {
