@@ -1,5 +1,5 @@
 {
-    "name": "phpixie/image
+    "name": "phpixie/image",
     "description": "PHPixie imageprocessing library",
     "keywords": ["image", "gd", "imagick", "gmagick", "imagemagick"],
     "homepage": "http://phpixie.com",
