@@ -36,7 +36,7 @@ class GD extends Driver{
 				break;
 			case "image/jpeg":
 				$image = imagecreatefromjpeg($file);
-				$this->format = 'jpeg';
+				$this->format = 'jpg';
 				break;
 			case "image/gif":
 				$this->format = 'gif';

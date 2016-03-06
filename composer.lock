@@ -1,0 +1,63 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "3058a6a054d8d349d926df13945350c5",
+    "content-hash": "e2f1550e8bf777f3b9e6ce090bd9c042",
+    "packages": [],
+    "packages-dev": [
+        {
+            "name": "phpixie/test",
+            "version": "3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPixie/Test.git",
+                "reference": "9663d651392185ace889fef15e7809a7bd302348"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPixie/Test/zipball/9663d651392185ace889fef15e7809a7bd302348",
+                "reference": "9663d651392185ace889fef15e7809a7bd302348",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "PHPixie": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Tsiupa",
+                    "email": "draconyster@gmail.com",
+                    "homepage": "http://dracony.org"
+                }
+            ],
+            "description": "Testing library for PHPixie",
+            "homepage": "http://phpixie.com",
+            "keywords": [
+                "phpunit",
+                "test"
+            ],
+            "time": "2015-03-09 13:46:41"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

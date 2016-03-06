@@ -12,11 +12,14 @@
             "homepage": "http://dracony.org"
         }
     ],
-    "require": {
-        "phpixie/core": "2.*@dev"
+    "require-dev": {
+        "phpixie/test": "~3.0"
     },
     "autoload": {
-        "psr-0": {"PHPixie": "classes/"}
+        "psr-4": {
+            "PHPixie\\": "src/PHPixie",
+            "PHPixie\\Tests\\": "tests/PHPixie/Tests"
+        }
     },
     "extra": {
         "branch-alias": {

@@ -1,0 +1,23 @@
+{
+    "name": "phpixie/test",
+    "description": "Testing library for PHPixie",
+    "keywords": ["test", "phpunit"],
+    "homepage": "http://phpixie.com",
+    "type": "library",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Roman Tsiupa",
+            "email": "draconyster@gmail.com",
+            "homepage": "http://dracony.org"
+        }
+    ],
+    "autoload": {
+        "psr-0": {"PHPixie": "src/"}
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.x-dev"
+        }
+    }
+}
