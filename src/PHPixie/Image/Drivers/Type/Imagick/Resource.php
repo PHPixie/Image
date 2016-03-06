@@ -3,7 +3,7 @@
 namespace PHPixie\Image\Drivers\Type\Imagick;
 
 /**
- * Imagick Image resource.
+ * Imagick image resource.
  */
 class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 {

@@ -3,7 +3,7 @@
 namespace PHPixie\Image\Drivers\Type\GD;
 
 /**
- * GD Image resource.
+ * GD image resource.
  */
 class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 {

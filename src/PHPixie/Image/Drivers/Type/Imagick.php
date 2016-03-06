@@ -31,7 +31,7 @@ class Imagick implements \PHPixie\Image\Drivers\Driver
 	}
     
     /**
-     * @param \Image $image
+     * @param \Imagick $image
      * @param int $width
      * @param int $height
      * @return Imagick\Resource
