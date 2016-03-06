@@ -19,8 +19,8 @@ class Gmagick extends Imagick
      * @param int $height
      * @return Gmagick\Resource
      */
-    protected function buildResource($image, $width, $height, $format)
+    protected function buildResource($image, $width, $height)
     {
-        return new Gmagick\Resource($image, $width, $height, $format);
+        return new Gmagick\Resource($image, $width, $height);
     }
 }
