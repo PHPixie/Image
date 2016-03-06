@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\Image\Drivers\Type\Imagick;
+namespace PHPixie\Image\Drivers\Type\Gmagick;
 
 /**
  * Gmagick image resource.
