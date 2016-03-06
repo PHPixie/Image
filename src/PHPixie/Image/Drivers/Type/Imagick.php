@@ -36,9 +36,9 @@ class Imagick implements \PHPixie\Image\Drivers\Driver
      * @param int $height
      * @return Imagick\Resource
      */
-    protected function buildResource($image, $width, $height, $format)
+    protected function buildResource($image, $width, $height)
     {
-        return new Imagick\Resource($image, $width, $height, $format);
+        return new Imagick\Resource($image, $width, $height);
     }
     
 	protected function getColor($color, $opacity) {
