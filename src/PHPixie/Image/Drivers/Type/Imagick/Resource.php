@@ -187,7 +187,7 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 		return $this;
 	}
 
-	public function testMetrics($text, $size, $fontFile) {
+	public function textMetrics($text, $size, $fontFile) {
 		$draw = new $this->drawClass();
 		$draw->setFont($fontFile);
 		$draw->setFontSize($size);
