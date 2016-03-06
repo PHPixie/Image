@@ -15,7 +15,7 @@ class Imagick implements \PHPixie\Image\Drivers\Driver
     
     public function create($width, $height, $color = 0xffffff, $opacity = 0) {
 		$image = new $this->imageClass();
-		$image->newImage($width, $height, $this->get_color($color, $opacity));
+		$image->newImage($width, $height, $this->getColor($color, $opacity));
 		return $this->buildResource($image, $width, $height);
 	}
 
