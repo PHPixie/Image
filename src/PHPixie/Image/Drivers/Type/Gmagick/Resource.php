@@ -45,10 +45,10 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
 		$draw->setFontSize($size);
 		$metrics = $this->image->queryFontMetrics($draw, $text);
 		return array(
-			'ascender'  => floor($metrics['boundingBox']['y2']),
-			'descender' => floor(-$metrics['boundingBox']['y1']),
+			'ascender'  => floor($metrics['ascender']),
+			'descender' => floor(-$metrics['descender']),
 			'width'     => floor($metrics['textWidth']),
-			'height'    => floor($metrics['boundingBox']['y2'] - $metrics['boundingBox']['y1']),
+			'height'    => floor($metrics['textHeight']),
 		);
 	}
 }
