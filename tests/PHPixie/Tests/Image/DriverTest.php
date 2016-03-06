@@ -163,7 +163,7 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 		$this->assertEquals(true, 6 > abs(75-$size['height']));
 	}
 	
-	public function testTest() {
+	public function testText() {
 		$img = $this->image->read($this->testPng);
 		$img->text("hello\nworld", 40, $this->testFont, 10, 54, 0xff0000, 0.5);
 		$this->assertClass($img);
