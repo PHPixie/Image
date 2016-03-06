@@ -38,4 +38,17 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
 		$color = ($color['r'] << 16) + ($color['g'] << 8) + $color['b'];
         return $this->buildPixel($x, $y, $color, null);
 	}
+    
+	public function textMetrics($text, $size, $fontFile) {
+		$draw = new $this->drawClass();
+		$draw->setFont($fontFile);
+		$draw->setFontSize($size);
+		$metrics = $this->image->queryFontMetrics($draw, $text);
+		return array(
+			'ascender'  => floor($metrics['boundingBox']['y2']),
+			'descender' => floor(-$metrics['boundingBox']['y1']),
+			'width'     => floor($metrics['textWidth']),
+			'height'    => floor($metrics['boundingBox']['y2'] - $metrics['boundingBox']['y1']),
+		);
+	}
 }
