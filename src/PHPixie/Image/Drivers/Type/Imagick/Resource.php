@@ -33,7 +33,8 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 
     public function __construct($image, $width, $height)
     {
-        $this->setImage($image, $width, $height);
+        $this->image = $image;
+        $this->updateSize($width, $height);
     }
 
 	/**
