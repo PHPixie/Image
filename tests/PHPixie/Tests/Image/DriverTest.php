@@ -12,7 +12,7 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
     
     protected $driver;
     protected $rotatedSize;
-    protected $dryRun = false
+    protected $dryRun = false;
 	
 	protected function setUp() {
 		$this->filesDir = realpath(__DIR__.'/../../../files/').'/';
