@@ -35,10 +35,7 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
         $pixel = $image->getImageHistogram()[0];
         
 		$color = $pixel->getColor(true);
-		$normalizedColor = $pixel->getColor(true, true);
-        print_r([$color, $normalizedColor]);
 		$color = ($color['r'] << 16) + ($color['g'] << 8) + $color['b'];
-        $opacity = $normalizedColor['a'];
-        return $this->buildPixel($x, $y, $color, $opacity);
+        return $this->buildPixel($x, $y, $color, null);
 	}
 }

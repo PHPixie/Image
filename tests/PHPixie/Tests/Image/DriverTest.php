@@ -12,6 +12,7 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
     
     protected $driver;
     protected $rotatedSize;
+    protected $supportsAlpha = true;
 	
 	protected function setUp() {
 		$this->filesDir = realpath(__DIR__.'/../../../files/').'/';
@@ -261,6 +262,8 @@ abstract class DriverTest extends \PHPixie\Test\Testcase{
 
         }
 		$this->assertEquals(true, 6 > max($dr, $db, $dg));
-		$this->assertEquals($opacity, round($pixel->opacity(), 1));
+        if($this->supportsAlpha) {
+            $this->assertEquals($opacity, round($pixel->opacity(), 1));
+        }
 	}
 }
