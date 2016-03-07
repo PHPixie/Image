@@ -82,20 +82,20 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
     public function render($format = 'png', $quality = 90) {
         switch($format) {
             case 'png':
-                header('Content-Type: image/png');
                 imagesavealpha($this->image, true);
+                ob_start();
                 imagepng($this->image);
-                break;
+                return ob_get_clean();
             case 'jpg':
-                header('Content-Type: image/jpeg');
                 $bg = $this->jpgBg($this->image);
+                ob_start();
                 imagejpeg($bg, null, $quality);
                 imagedestroy($bg);
-                break;
+                return ob_get_clean();
             case 'gif':
-                header('Content-Type: image/gif');
+                ob_start();
                 imagegif($this->image);
-                break;
+                return ob_get_clean();
             default:
                 throw new \PHPixie\Image\Exception("Type must be either png, jpg or gif");
         }

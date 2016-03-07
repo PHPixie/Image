@@ -86,18 +86,16 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 		switch($format) {
 			case 'png':
 			case 'gif':
-				header('Content-Type: image/'.$format);
 				$image->setImageFormat($format);
 				break;
 			case 'jpg':
-				header('Content-Type: image/jpeg');
 				$image = $this->jpgBg($this->image);
 				break;
 			default:
 				throw new \Exception("Type must be either png, jpg or gif");
 		}
 		$this->setQuality($quality);
-		echo $image;
+		return (string)$image;
 	}
 
 	public function save($file, $format = null, $quality = 90) {
@@ -200,7 +198,7 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 	 * Set Compression Quality
      *
 	 * @params integer $quality Compression quality
-	 * 
+	 *
      * @return void
 	 */
     protected function setQuality($quality) {
