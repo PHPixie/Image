@@ -184,7 +184,7 @@ $canvas->overlay($small)
 Drawing text is one of the most frustrating things in image manipulation, especially when it comes to wrapping text
 over multiple lines. Before we look at examples, let's take a look at font metrics.
 
- ![Font Metrics](http://phpixie.com/wp-content/uploads/2013/07/Typography_Line_Terms.svg_.png)
+ ![Font Metrics](https://phpixie.com/images/blog/2013/07/Typography_Line_Terms.svg_.png)
 
 
 When specifying text coordinates we will be specifying the coordinates of the *baseline*, so the text will appear slightly higher.
