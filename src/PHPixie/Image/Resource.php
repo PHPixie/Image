@@ -271,10 +271,10 @@ abstract class Resource
      *
      * @return array Pixel color data
      */
-    public abstract function get_pixel($x, $y);
+    public abstract function getPixel($x, $y);
 
     /**
-     * Renders and ouputs the image.
+     * Renders and outputs the image.
      *
      * @param string $format Image format (gif, png or jpeg)
      * @param bool $die Whether to stop script execution after image has been outputted.
