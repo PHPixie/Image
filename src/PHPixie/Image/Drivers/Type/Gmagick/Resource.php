@@ -19,12 +19,14 @@ class Resource extends \PHPixie\Image\Drivers\Type\Imagick\Resource
 	 */
 	protected $drawClass  = '\GmagickDraw';
 
-	/**
-	 * Composition mode
-	 * @var int
-	 */
-	protected $compositionMode =  \Gmagick::COMPOSITE_OVER;
-    
+    public function __construct($image, $width, $height)
+    {
+        parent::__construct($image, $width, $height);
+        if (class_exists('\Gmagick', false)) {
+            $this->compositionMode = \Gmagick::COMPOSITE_OVER;
+        }
+    }
+
     protected function setQuality($quality) {
         $this->image->setCompressionQuality($quality);
     }

@@ -29,12 +29,15 @@ class Resource extends \PHPixie\Image\Drivers\Driver\Resource
 	 * Composition mode
 	 * @var int
 	 */
-	protected $compositionMode =  \Imagick::COMPOSITE_OVER;
+	protected $compositionMode;
 
     public function __construct($image, $width, $height)
     {
         $this->image = $image;
         $this->updateSize($width, $height);
+        if (class_exists('\Imagick', false)) {
+            $this->compositionMode = \Imagick::COMPOSITE_OVER;
+        }
     }
 
 	/**
